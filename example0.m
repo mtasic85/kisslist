@@ -21,8 +21,6 @@
 
 (print (filter (range 10) (fn f (n) ((% n 2)))))
 
-
-
 (fn f (a) (
     (fn g (b) (
         (+ a b)
