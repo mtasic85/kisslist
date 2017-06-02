@@ -12,3 +12,5 @@
 (print (f 10 20))
 
 (print (reduce (1 2 3) 0 (fn f (n s) ((+ n s)))))
+
+(print (range 5 10 2))

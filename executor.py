@@ -78,6 +78,9 @@ class Executor:
         def print_(*args):
             print(*args)
 
+        def range_(*args):
+            return list(range(*args))
+
         def map_(obj, func):
             return list(map(func, obj))
 
@@ -95,6 +98,7 @@ class Executor:
             '%': mod_,
             '**': pow_,
             'print': print_,
+            'range': range_,
             'map': map_,
             'filter': filter_,
             'reduce': reduce_,
