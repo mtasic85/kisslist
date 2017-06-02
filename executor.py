@@ -75,6 +75,18 @@ class Executor:
         def pow_(a, b):
             return a ** b
 
+        def not_(a):
+            return not a
+
+        def and_(a, b):
+            return a and b
+
+        def or_(a, b):
+            return a or b
+        
+        def eq_(a, b):
+            return a == b
+
         def print_(*args):
             print(*args)
 
@@ -97,6 +109,10 @@ class Executor:
             '/': div_,
             '%': mod_,
             '**': pow_,
+            'not': not_,
+            'and': and_,
+            'or': or_,
+            '==': eq_,
             'print': print_,
             'range': range_,
             'map': map_,
@@ -131,8 +147,14 @@ class Executor:
         elif isinstance(ast, list) and ast[0] == 'if':
             # conditional
             test, conseq, alt = ast[1:]
-            exp = conseq if self.eval(test, globals_, locals_) else alt
-            res = self.eval(exp, globals_, locals_)
+
+            if self.eval(test, globals_, locals_):
+                for n in conseq:
+                    res = self.eval(n, globals_, locals_)
+            else:
+                for n in alt:
+                    res = self.eval(n, globals_, locals_)
+            
             return res
         elif isinstance(ast, list) and ast[0] == 'def':
             # variable
