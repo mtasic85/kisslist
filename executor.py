@@ -109,7 +109,7 @@ class Executor:
         tokens = self.parser.tokenizer.tokenize(text)
         # print(f'debug exec tokens: {tokens!r}')
         ast = self.parser.parse(tokens)
-        print(f'debug exec ast: {ast!r}')
+        # print(f'debug exec ast: {ast!r}')
         globals_ = globals_ if globals_ else self.globals
         locals_ = locals_ if locals_ else {}
 
