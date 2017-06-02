@@ -34,6 +34,6 @@
 (print b)
 
 (if (== b 15)
-    ((print true) (print true))
+    ((print true))
     ((print false))
 )
