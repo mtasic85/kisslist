@@ -169,6 +169,12 @@ class Executor:
             func = Function(self, name, params, body, env)
             env[name] = func
             return func
+        elif isinstance(ast, list) and ast[0] == 'lambda':
+            # function
+            # print('!2')
+            params, body = ast[1:]
+            func = Function(self, None, params, body, env)
+            return func
         elif isinstance(ast, list) and ast[0] in env:
             var = env[ast[0]]
             # print('!', var)
