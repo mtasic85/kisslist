@@ -84,8 +84,23 @@ class Executor:
         def or_(a, b):
             return a or b
         
+        def lt_(a, b):
+            return a < b
+
+        def le_(a, b):
+            return a <= b
+
+        def gt_(a, b):
+            return a > b
+
+        def ge_(a, b):
+            return a >= b
+
         def eq_(a, b):
             return a == b
+
+        def ne_(a, b):
+            return a != b
 
         def print_(*args):
             print(*args)
@@ -101,6 +116,9 @@ class Executor:
 
         def reduce_(obj, s, func):
             return functools.reduce(func, obj, s)
+
+        def get_(obj, index_or_key):
+            return obj[index_or_key]
         
         self.globals = {
             '+': add_,
@@ -109,15 +127,21 @@ class Executor:
             '/': div_,
             '%': mod_,
             '**': pow_,
-            'not': not_,
-            'and': and_,
-            'or': or_,
+            'not': not_,    '!': not_,
+            'and': and_,    '&&': and_,
+            'or': or_,      '||': or_,
+            '<': lt_,
+            '<=': le_,
+            '>': gt_,
+            '>=': ge_,
             '==': eq_,
+            '!=': ne_,
             'print': print_,
             'range': range_,
             'map': map_,
             'filter': filter_,
             'reduce': reduce_,
+            'get': get_,
         }
 
 
@@ -144,16 +168,21 @@ class Executor:
         elif isinstance(ast, (int, float)):
             # number
             return ast
-        elif isinstance(ast, list) and ast[0] == 'if':
+        elif isinstance(ast, list) and ast[0] in ('if', '?'):
             # conditional
             test, conseq, alt = ast[1:]
+            test_result = self.eval(test, globals_, locals_)
+            # print('test_result:', test_result)
 
-            if self.eval(test, globals_, locals_):
+            if test_result:
                 for n in conseq:
+                    # print('n[0]:', n)
                     res = self.eval(n, globals_, locals_)
+                    # print('res[0]:', res)
             else:
                 for n in alt:
                     res = self.eval(n, globals_, locals_)
+                    # print('res[1]:', res)
             
             return res
         elif isinstance(ast, list) and ast[0] == 'def':
@@ -175,19 +204,12 @@ class Executor:
             params, body = ast[1:]
             func = Function(self, None, params, body, env)
             return func
-        elif isinstance(ast, list) and ast[0] in env:
-            var = env[ast[0]]
-            # print('!', var)
-
-            # if isinstance(var, Function):
-            if callable(var):
-                # function call
-                func = self.eval(ast[0], globals_, locals_)
-                args = [self.eval(arg, globals_, locals_) for arg in ast[1:]]
-                res = func(*args)
-                return res
-            else:
-                return var
+        elif isinstance(ast, list) and ast[0] in env and callable(env[ast[0]]):
+            # function call
+            func = self.eval(ast[0], globals_, locals_)
+            args = [self.eval(arg, globals_, locals_) for arg in ast[1:]]
+            res = func(*args)
+            return res
         else:
             # constant literal
             return ast

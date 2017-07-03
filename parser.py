@@ -47,7 +47,7 @@ class Parser:
             return True
         elif token == 'false':
             return False
-        elif token == 'nil':
+        elif token in ('nil', 'null'):
             return None
         else:
             try:
