@@ -43,6 +43,10 @@ class Function:
         self.closure = closure
 
 
+    def __repr__(self):
+        return f'<Function id:{id(self)} name:{self.name} params:{self.params}>'
+
+
     def __call__(self, *args):
         globals_ = self.closure
         locals_ = {k: v for k, v in zip(self.params, args)}
@@ -105,6 +109,9 @@ class Executor:
         def print_(*args):
             print(*args)
 
+        def list_(*args):
+            return list(args)
+
         def range_(*args):
             return list(range(*args))
 
@@ -137,6 +144,7 @@ class Executor:
             '==': eq_,
             '!=': ne_,
             'print': print_,
+            'list': list_,
             'range': range_,
             'map': map_,
             'filter': filter_,
@@ -164,52 +172,65 @@ class Executor:
 
         if isinstance(ast, Symbol):
             # variable reference
+            print('[0]:', ast)
             return env[ast]
         elif isinstance(ast, (int, float)):
             # number
+            print('[1]:', ast)
             return ast
+        elif isinstance(ast, list) and len(ast) == 0:
+            print('[2]:', ast)
+            return []
         elif isinstance(ast, list) and ast[0] in ('if', '?'):
             # conditional
+            print('[3]:', ast)
             test, conseq, alt = ast[1:]
             test_result = self.eval(test, globals_, locals_)
-            # print('test_result:', test_result)
 
             if test_result:
                 for n in conseq:
-                    # print('n[0]:', n)
                     res = self.eval(n, globals_, locals_)
-                    # print('res[0]:', res)
             else:
                 for n in alt:
                     res = self.eval(n, globals_, locals_)
-                    # print('res[1]:', res)
             
             return res
-        elif isinstance(ast, list) and ast[0] == 'def':
+        elif isinstance(ast, list) and ast[0] == 'let':
             # variable
-            var, exp = ast[1:]
+            print('[4]:', ast)
+            var_name, exp = ast[1:]
             res = self.eval(exp, globals_, locals_)
-            env[var] = res
+            env[var_name] = res
             return res
         elif isinstance(ast, list) and ast[0] == 'fn':
             # function
-            # print('!2')
-            name, params, body = ast[1:]
-            func = Function(self, name, params, body, env)
-            env[name] = func
-            return func
-        elif isinstance(ast, list) and ast[0] == 'lambda':
-            # function
-            # print('!2')
-            params, body = ast[1:]
-            func = Function(self, None, params, body, env)
+            print('[5]:', ast)
+            if len(ast[1:]) == 1:
+                func_name = None
+                params = []
+                body = ast[1]
+            elif len(ast[1:]) == 2:
+                func_name = None
+                params, body = ast[1:]
+            elif len(ast[1:]) == 3:
+                func_name, params, body = ast[1:]
+            else:
+                raise SyntaxError('')
+            
+            func = Function(self, func_name, params, body, env)
+
+            if func_name:
+                env[func_name] = func
+
             return func
         elif isinstance(ast, list) and ast[0] in env and callable(env[ast[0]]):
             # function call
+            print('[6]:', ast)
             func = self.eval(ast[0], globals_, locals_)
             args = [self.eval(arg, globals_, locals_) for arg in ast[1:]]
             res = func(*args)
             return res
         else:
             # constant literal
+            print('[7]:', ast)
             return ast
