@@ -119,11 +119,39 @@ class Tokenizer:
                     j = i + 2
                     c = text[j]
 
-                    while c in '01234567':
+                    while c in '01':
+                        j += 1
+                        c = text[j]
+                else:
+                    # decimal
+                    j = i + 2
+                    c = text[j]
+
+                    while c in string.digits:
                         j += 1
                         c = text[j]
 
-                token = Token(Symbol.NAME, text[i:j], linenum, colnum)
+                token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
+                tokens.append(token)
+                colnum += j - i
+                i = j
+            elif c == '\'':
+                # ' string
+                j = i + 1
+                c = text[j]
+
+                while c is not '\'':
+                    if c == '\\':
+                        j += 2
+                    else:
+                        j += 1
+
+                    print(f'c: {c!r}')
+                    c = text[j]
+
+                j += 1
+
+                token = Token(Symbol.STRING, text[i:j], linenum, colnum)
                 tokens.append(token)
                 colnum += j - i
                 i = j
@@ -135,9 +163,11 @@ class Tokenizer:
 
 
 if __name__ == '__main__':
-    text = '''
+    text = r'''
     _aaa aaa a_a_
-    122 __a
+    122 __a 0x12f
+    0b111 0o333
+    123g 'asasa' 'frfr \' asda'
     '''
 
     tokenizer = Tokenizer()
