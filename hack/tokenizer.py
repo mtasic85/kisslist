@@ -53,7 +53,6 @@ class Symbol(Enum):
     DOUBLESTAREQUAL = auto()
     DOUBLESLASHEQUAL = auto()
 
-
 class Token:
     def __init__(self, symbol, text, linenum, colnum):
         self.symbol = symbol
@@ -73,19 +72,21 @@ class Tokenizer:
     def tokenize(self, text):
         tokens = []
         i = 0
-        linenum = 0
-        colnum = 0
+        linenum = 1
+        colnum = 1
 
         while i < len(text):
             c = text[i]
 
             if c in ('\n', '\r'):
+                # new line
                 token = Token(Symbol.NEWLINE, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 linenum += 1
-                colnum = 0
+                colnum = 1
                 i += 1
             elif c in '_' + string.ascii_letters:
+                # name
                 j = i
 
                 while c in '_' + string.ascii_letters + string.digits:
@@ -97,44 +98,95 @@ class Tokenizer:
                 colnum += j - i
                 i = j
             elif c in string.digits:
-                # FIXME: possible issue if something invalid is just behind number
+                # number
                 if text[i + 1] == 'x':
                     # hex
                     j = i + 2
                     c = text[j]
 
-                    while c in string.hexdigits:
-                        j += 1
-                        c = text[j]
+                    while True:
+                        if c in string.hexdigits:
+                            j += 1
+                            c = text[j]
+                        elif c in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
+                            token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
+                            break
+                        else:
+                            token = Token(Symbol.ERRORTOKEN, text[i:j], linenum, colnum)
+                            break
+
+                    tokens.append(token)
+                    colnum += j - i
+                    i = j
                 elif text[i + 1] == 'o':
                     # octal
                     j = i + 2
                     c = text[j]
 
-                    while c in '01234567':
-                        j += 1
-                        c = text[j]
-                elif text[i + 1] == 'o':
+                    while True:
+                        if c in '01234567':
+                            j += 1
+                            c = text[j]
+                        elif c in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
+                            token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
+                            break
+                        else:
+                            token = Token(Symbol.ERRORTOKEN, text[i:j], linenum, colnum)
+                            break
+
+                    tokens.append(token)
+                    colnum += j - i
+                    i = j
+                elif text[i + 1] == 'b':
                     # binary
                     j = i + 2
                     c = text[j]
 
-                    while c in '01':
-                        j += 1
-                        c = text[j]
-                else:
+                    while True:
+                        if c in '01':
+                            j += 1
+                            c = text[j]
+                        elif c in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
+                            token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
+                            break
+                        else:
+                            token = Token(Symbol.ERRORTOKEN, text[i:j], linenum, colnum)
+                            break
+
+                    tokens.append(token)
+                    colnum += j - i
+                    i = j
+                elif text[i + 1] in string.digits:
                     # decimal
-                    j = i + 2
+                    j = i + 1
                     c = text[j]
 
-                    while c in string.digits:
-                        j += 1
-                        c = text[j]
+                    while True:
+                        if c in string.digits:
+                            j += 1
+                            c = text[j]
+                        elif c in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
+                            token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
+                            break
+                        else:
+                            token = Token(Symbol.ERRORTOKEN, text[i:j], linenum, colnum)
+                            break
 
-                token = Token(Symbol.NUMBER, text[i:j], linenum, colnum)
-                tokens.append(token)
-                colnum += j - i
-                i = j
+                    tokens.append(token)
+                    colnum += j - i
+                    i = j
+                elif text[i + 1] in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
+                    token = Token(Symbol.NUMBER, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+                else:
+                    token = Token(Symbol.ERRORTOKEN, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+
+                
             elif c == '\'':
                 # ' string
                 j = i + 1
@@ -146,15 +198,57 @@ class Tokenizer:
                     else:
                         j += 1
 
-                    print(f'c: {c!r}')
+                    if j >= len(text):
+                        break
+
                     c = text[j]
 
-                j += 1
-
-                token = Token(Symbol.STRING, text[i:j], linenum, colnum)
-                tokens.append(token)
+                if c == '\'':
+                    j += 1
+                    token = Token(Symbol.STRING, text[i:j], linenum, colnum)
+                    tokens.append(token)
+                else:
+                    token = Token(Symbol.ERRORTOKEN, text[i:j], linenum, colnum)
+                    tokens.append(token)
+                
                 colnum += j - i
                 i = j
+            elif c == '(':
+                # lpar
+                token = Token(Symbol.LPAR, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == ')':
+                # rpar
+                token = Token(Symbol.RPAR, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '[':
+                # lpar
+                token = Token(Symbol.LSQB, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == ']':
+                # rpar
+                token = Token(Symbol.RSQB, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '{':
+                # lpar
+                token = Token(Symbol.LBRACE, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '}':
+                # rpar
+                token = Token(Symbol.RBRACE, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
             else:
                 colnum += 1
                 i += 1
@@ -165,11 +259,16 @@ class Tokenizer:
 if __name__ == '__main__':
     text = r'''
     _aaa aaa a_a_
-    122 __a 0x12f
+    122 __a 0x12f 0x1() 0x1g
     0b111 0o333
     123g 'asasa' 'frfr \' asda'
+    () ( ) (1,) (a, 110, 0b1, 0o7)
+    [[1], (,)]
+    '
+    '
     '''
 
     tokenizer = Tokenizer()
     tokens = tokenizer.tokenize(text)
-    print('tokens:', tokens)
+    print('tokens:')
+    for n in tokens: print(n)
