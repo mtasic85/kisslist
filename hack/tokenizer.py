@@ -18,12 +18,12 @@ class Symbol(Enum):
     COLON = auto()
     COMMA = auto()
     SEMI = auto()
+    QUESTIONMARK = auto()
     AT = auto()
     PLUS = auto()
     MINUS = auto()
     STAR = auto()
     SLASH = auto()
-    DOUBLESLASH = auto()
     VBAR = auto()
     AMPER = auto()
     LESS = auto()
@@ -31,12 +31,12 @@ class Symbol(Enum):
     EQUAL = auto()
     DOT = auto()
     PERCENT = auto()
+    TILDE = auto()
+    CIRCUMFLEX = auto()
     EQEQUAL = auto()
     NOTEQUAL = auto()
     LESSEQUAL = auto()
     GREATEREQUAL = auto()
-    TILDE = auto()
-    CIRCUMFLEX = auto()
     LEFTSHIFT = auto()
     RIGHTSHIFT = auto()
     DOUBLESTAR = auto()
@@ -45,13 +45,12 @@ class Symbol(Enum):
     STAREQUAL = auto()
     SLASHEQUAL = auto()
     PERCENTEQUAL = auto()
-    AMPEREQUAL = auto()
     VBAREQUAL = auto()
     CIRCUMFLEXEQUAL = auto()
     LEFTSHIFTEQUAL = auto()
     RIGHTSHIFTEQUAL = auto()
     DOUBLESTAREQUAL = auto()
-    DOUBLESLASHEQUAL = auto()
+    ARROW = auto()
 
 class Token:
     def __init__(self, symbol, text, linenum, colnum):
@@ -74,6 +73,9 @@ class Tokenizer:
         i = 0
         linenum = 1
         colnum = 1
+
+        token = Token(Symbol.BEGINMARKER, text[0:0], linenum, colnum)
+        tokens.append(token)
 
         while i < len(text):
             c = text[i]
@@ -249,10 +251,120 @@ class Tokenizer:
                 tokens.append(token)
                 colnum += 1
                 i += 1
+            elif c == ':':
+                # rpar
+                token = Token(Symbol.COLON, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == ',':
+                # rpar
+                token = Token(Symbol.COMMA, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == ';':
+                # rpar
+                token = Token(Symbol.SEMI, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '?':
+                # rpar
+                token = Token(Symbol.QUESTIONMARK, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '@':
+                # rpar
+                token = Token(Symbol.AT, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '+':
+                # rpar
+                token = Token(Symbol.PLUS, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '-':
+                # rpar
+                token = Token(Symbol.MINUS, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '*':
+                # rpar
+                token = Token(Symbol.STAR, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '/':
+                # rpar
+                token = Token(Symbol.SLASH, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '|':
+                # rpar
+                token = Token(Symbol.VBAR, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '&':
+                # rpar
+                token = Token(Symbol.AMPER, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '<':
+                # rpar
+                token = Token(Symbol.LESS, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '>':
+                # rpar
+                token = Token(Symbol.GREATER, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '=':
+                # rpar
+                token = Token(Symbol.EQUAL, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '.':
+                # rpar
+                token = Token(Symbol.DOT, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '%':
+                # rpar
+                token = Token(Symbol.PERCENT, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '~':
+                # rpar
+                token = Token(Symbol.TILDE, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == '^':
+                # rpar
+                token = Token(Symbol.CIRCUMFLEX, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
             else:
                 colnum += 1
                 i += 1
 
+        token = Token(Symbol.ENDMARKER, text[-1:-1], linenum, colnum)
+        tokens.append(token)
         return tokens
 
 
@@ -264,8 +376,13 @@ if __name__ == '__main__':
     123g 'asasa' 'frfr \' asda'
     () ( ) (1,) (a, 110, 0b1, 0o7)
     [[1], (,)]
+    
     '
     '
+
+    f = (x, y) -> {x + y}
+    g = (h) -> (x, y) -> f(x, y)
+    g(f)(10, 20)
     '''
 
     tokenizer = Tokenizer()
