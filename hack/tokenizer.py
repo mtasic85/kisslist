@@ -19,6 +19,7 @@ class Symbol(Enum):
     COMMA = auto()
     SEMI = auto()
     QUESTIONMARK = auto()
+    EXCLAMATIONMARK = auto()
     AT = auto()
     PLUS = auto()
     MINUS = auto()
@@ -46,6 +47,7 @@ class Symbol(Enum):
     SLASHEQUAL = auto()
     PERCENTEQUAL = auto()
     VBAREQUAL = auto()
+    AMPEREQUAL = auto()
     CIRCUMFLEXEQUAL = auto()
     LEFTSHIFTEQUAL = auto()
     RIGHTSHIFTEQUAL = auto()
@@ -187,8 +189,6 @@ class Tokenizer:
                     tokens.append(token)
                     colnum += 1
                     i += 1
-
-                
             elif c == '\'':
                 # ' string
                 j = i + 1
@@ -216,150 +216,241 @@ class Tokenizer:
                 colnum += j - i
                 i = j
             elif c == '(':
-                # lpar
                 token = Token(Symbol.LPAR, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == ')':
-                # rpar
                 token = Token(Symbol.RPAR, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == '[':
-                # lpar
                 token = Token(Symbol.LSQB, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == ']':
-                # rpar
                 token = Token(Symbol.RSQB, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == '{':
-                # lpar
                 token = Token(Symbol.LBRACE, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == '}':
-                # rpar
                 token = Token(Symbol.RBRACE, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == ':':
-                # rpar
                 token = Token(Symbol.COLON, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
-            elif c == ',':
-                # rpar
-                token = Token(Symbol.COMMA, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
             elif c == ';':
-                # rpar
                 token = Token(Symbol.SEMI, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
+            elif c == '.':
+                token = Token(Symbol.DOT, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
+            elif c == ',':
+                token = Token(Symbol.COMMA, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
+                colnum += 1
+                i += 1
             elif c == '?':
-                # rpar
                 token = Token(Symbol.QUESTIONMARK, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
             elif c == '@':
-                # rpar
                 token = Token(Symbol.AT, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
-            elif c == '+':
-                # rpar
-                token = Token(Symbol.PLUS, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '-':
-                # rpar
-                token = Token(Symbol.MINUS, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '*':
-                # rpar
-                token = Token(Symbol.STAR, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '/':
-                # rpar
-                token = Token(Symbol.SLASH, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '|':
-                # rpar
-                token = Token(Symbol.VBAR, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '&':
-                # rpar
-                token = Token(Symbol.AMPER, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '<':
-                # rpar
-                token = Token(Symbol.LESS, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '>':
-                # rpar
-                token = Token(Symbol.GREATER, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '=':
-                # rpar
-                token = Token(Symbol.EQUAL, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '.':
-                # rpar
-                token = Token(Symbol.DOT, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
-            elif c == '%':
-                # rpar
-                token = Token(Symbol.PERCENT, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
-                colnum += 1
-                i += 1
             elif c == '~':
-                # rpar
                 token = Token(Symbol.TILDE, text[i:i + 1], linenum, colnum)
                 tokens.append(token)
                 colnum += 1
                 i += 1
+            elif c == '+':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.PLUSEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.PLUS, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '-':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.MINEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.MINUS, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '*':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.STAREQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                elif text[i + 1] == '*':
+                    if text[i + 2] == '=':
+                        token = Token(Symbol.DOUBLESTAREQUAL, text[i:i + 3], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 3
+                        i += 3
+                    else:
+                        token = Token(Symbol.DOUBLESTAR, text[i:i + 2], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 2
+                        i += 2
+                else:
+                    token = Token(Symbol.STAR, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '/':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.SLASHEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.SLASH, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '|':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.VBAREQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.VBAR, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '&':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.AMPEREQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.AMPER, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '%':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.PERCENTEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.PERCENT, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
             elif c == '^':
-                # rpar
-                token = Token(Symbol.CIRCUMFLEX, text[i:i + 1], linenum, colnum)
-                tokens.append(token)
+                if text[i + 1] == '=':
+                    token = Token(Symbol.CIRCUMFLEXEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.CIRCUMFLEX, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '=':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.EQEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.EQUAL, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '!':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.NOTEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                else:
+                    token = Token(Symbol.EXCLAMATIONMARK, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '<':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.LESSEQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                elif text[i + 1] == '<':
+                    if text[i + 2] == '=':
+                        token = Token(Symbol.LEFTSHIFTEQUAL, text[i:i + 3], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 3
+                        i += 3
+                    else:
+                        token = Token(Symbol.LEFTSHIFT, text[i:i + 2], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 2
+                        i += 2
+                else:
+                    token = Token(Symbol.LESS, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c == '>':
+                if text[i + 1] == '=':
+                    token = Token(Symbol.GREATEREQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                elif text[i + 1] == '>':
+                    if text[i + 2] == '=':
+                        token = Token(Symbol.RIGHTSHIFTEQUAL, text[i:i + 3], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 3
+                        i += 3
+                    else:
+                        token = Token(Symbol.RIGHTSHIFT, text[i:i + 2], linenum, colnum)
+                        tokens.append(token)
+                        colnum += 2
+                        i += 2
+                else:
+                    token = Token(Symbol.GREATER, text[i:i + 1], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 1
+                    i += 1
+            elif c in string.whitespace:
                 colnum += 1
                 i += 1
             else:
+                token = Token(Symbol.ERRORTOKEN, text[i:i + 1], linenum, colnum)
+                tokens.append(token)
                 colnum += 1
                 i += 1
 
@@ -383,6 +474,15 @@ if __name__ == '__main__':
     f = (x, y) -> {x + y}
     g = (h) -> (x, y) -> f(x, y)
     g(f)(10, 20)
+    a += 1
+    b-=a
+    c*= b
+    d /= c
+    e <<= d
+    f >> e
+    g == f
+    h != g + !f
+    _ '$' = 1
     '''
 
     tokenizer = Tokenizer()
