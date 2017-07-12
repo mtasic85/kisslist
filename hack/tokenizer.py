@@ -483,6 +483,8 @@ if __name__ == '__main__':
     g == f
     h != g + !f
     _ '$' = 1
+    a ** b
+    c **= d
     '''
 
     tokenizer = Tokenizer()
