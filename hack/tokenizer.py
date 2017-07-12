@@ -52,6 +52,8 @@ class Symbol(Enum):
     LEFTSHIFTEQUAL = auto()
     RIGHTSHIFTEQUAL = auto()
     DOUBLESTAREQUAL = auto()
+    DOUBLEAMPER = auto()
+    DOUBLEVBAR = auto()
     ARROW = auto()
 
 class Token:
@@ -128,7 +130,7 @@ class Tokenizer:
                     c = text[j]
 
                     while True:
-                        if c in '01234567':
+                        if c in string.octdigits:
                             j += 1
                             c = text[j]
                         elif c in '!"$%&\'()*+,-./:;<=>?@[\\]^`{|}~ \t\n\r\x0b\x0c':
@@ -341,6 +343,11 @@ class Tokenizer:
                     tokens.append(token)
                     colnum += 2
                     i += 2
+                elif text[i + 1] == '|':
+                    token = Token(Symbol.DOUBLEVBAR, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
                 else:
                     token = Token(Symbol.VBAR, text[i:i + 1], linenum, colnum)
                     tokens.append(token)
@@ -349,6 +356,11 @@ class Tokenizer:
             elif c == '&':
                 if text[i + 1] == '=':
                     token = Token(Symbol.AMPEREQUAL, text[i:i + 2], linenum, colnum)
+                    tokens.append(token)
+                    colnum += 2
+                    i += 2
+                elif text[i + 1] == '&':
+                    token = Token(Symbol.DOUBLEAMPER, text[i:i + 2], linenum, colnum)
                     tokens.append(token)
                     colnum += 2
                     i += 2
