@@ -18,6 +18,7 @@ d = 'some string'   // str
 a = [0, 1, null] + []                   // list
 b = {-2, true, false} + {/}             // set
 c = {'a': a, 'b': b, 'c': null} + {}    // dict
+d = {a = 'a'; b = 'b'; c = 'c'}         // dict
 ```
 
 ## Functions

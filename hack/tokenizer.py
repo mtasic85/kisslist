@@ -69,10 +69,18 @@ class Token:
 
 
 class Tokenizer:
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
 
-    def tokenize(self, text):
+    
+    def tokenize(self):
+        with open(self.path, 'r') as f:
+            text = f.read()
+
+        return self.tokenize_text(text)
+
+
+    def tokenize_text(self, text):
         tokens = []
         i = 0
         linenum = 1

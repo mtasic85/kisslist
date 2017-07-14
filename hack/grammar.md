@@ -2,9 +2,9 @@
 
 
 ```
-suite: '{' stmtlist '}'
-stmtlist: stmt*
-stmt: expr_stmt (';'|NEWLINE)*
+suite: '{' expr_list '}'
+expr_list: expr*
+expr: expr_stmt (';'|NEWLINE)*
 
 augassign: '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**='
 comp_op: '<' | '>' | '==' | '>=' | '<=' | '!='
